@@ -1,6 +1,17 @@
+import 'package:continous_data_searcher/testSearch.dart';
 import 'package:flutter/material.dart';
-
 import 'globals.dart';
+import 'about.dart';
+
+void main() async {
+  glEmail = 'vprihogenko@yahoo.com'; glName = 'v'; glCode = '2261';
+  runApp(
+      const MediaQuery(
+          data: MediaQueryData(),
+          child: MaterialApp(home: WorkArea())
+      )
+  );
+}
 
 class WorkArea extends StatefulWidget {
   const WorkArea({Key? key}) : super(key: key);
@@ -100,6 +111,10 @@ class _WorkAreaState extends State<WorkArea> {
     if (result == null || result == 'cancel') {
       return;
     }
+    if (tecKeywords.text.trim().length < 5) {
+      await glShowAlertPage(context, 'use correct keywords please');
+      return;
+    }
     Search search = Search();
     search.keywords = tecKeywords.text.trim();
     search.site = tecSite.text.trim();
@@ -190,6 +205,10 @@ class _WorkAreaState extends State<WorkArea> {
         }
     );
     if (result == null || result == 'cancel') {
+      return;
+    }
+    if (tecKeywords.text.trim().length < 5) {
+      await glShowAlertPage(context, 'use correct keywords please');
       return;
     }
     element.keywords = tecKeywords.text.trim();
@@ -296,8 +315,12 @@ class _WorkAreaState extends State<WorkArea> {
     }
   }
 
-  _testSearch(element){
+  _testSearch(Search element) async {
     print('test $element');
+    glSearch = element;
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const TestSearch())
+    );
   }
 
   List <Widget> existingSearches () {
@@ -310,13 +333,16 @@ class _WorkAreaState extends State<WorkArea> {
         child: Row(
           children: [
             Expanded(
-              child: GestureDetector(
-                onTap: (){
-                  _testSearch(element);
-                },
-                child: Text(element.keywords+
-                  (element.site == ''? '' : '\n${element.site}')
-                ),
+              child: Text(element.keywords+
+                (element.site == ''? '' : '\n${element.site}')
+              ),
+            ),
+            IconButton(
+              onPressed: (){
+                _testSearch(element);
+              },
+              icon: Icon(
+                Icons.touch_app_outlined,
               ),
             ),
             IconButton(
@@ -350,12 +376,19 @@ class _WorkAreaState extends State<WorkArea> {
           children: [
             const Text('Your searches'),
             const Spacer(),
-            Text('Hello,\n$glName', textScaleFactor: 0.8,),
+            GestureDetector(
+              onTap: (){
+                Navigator.pop(context);
+              },
+              child: Text('Hello,\n$glName', textScaleFactor: 0.8,)
+            ),
             IconButton(
                 onPressed: (){
-                  Navigator.pop(context);
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const About())
+                  );
                 },
-                icon: const Icon(Icons.exit_to_app)
+                icon: const Icon(Icons.help, size: 30,)
             ),
           ],
         ),

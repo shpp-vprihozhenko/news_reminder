@@ -1,8 +1,7 @@
 import 'dart:io' show Platform;
-import 'package:continous_data_searcher/globals.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-
+import 'globals.dart';
 import 'workArea.dart';
 
 void main() => runApp(MyApp());
@@ -22,6 +21,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => MyHomePage(),
       },
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -106,6 +106,7 @@ class _MyHomePage extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Login page'),
@@ -126,6 +127,7 @@ class _MyHomePage extends State<MyHomePage> {
                   style: const TextStyle(color: Colors.blue),
                   textAlign: TextAlign.center,
                   showCursor: true,
+                  autofocus: !isWaitingForConfirmationCode,
                   decoration: InputDecoration(
                     labelText: "Email",
                     floatingLabelAlignment: FloatingLabelAlignment.center,
@@ -137,6 +139,12 @@ class _MyHomePage extends State<MyHomePage> {
                       borderRadius: BorderRadius.circular(25.0),
                     ),
                   ),
+                ),
+                const SizedBox(height: 12,),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(primary: Colors.green),
+                  onPressed: !isWaitingForConfirmationCode? _ok:null,
+                  child: const Text('send confirmation code', textScaleFactor: 1.4,), //style: TextStyle(backgroundColor: Colors.green)
                 ),
                 const SizedBox(height: 12,),
                 TextField(
@@ -154,8 +162,7 @@ class _MyHomePage extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                isWaitingForConfirmationCode?
-                    Column(
+                Column(
                       children: [
                         const SizedBox(height: 12,),
                         const Divider(thickness: 2,),
@@ -164,8 +171,9 @@ class _MyHomePage extends State<MyHomePage> {
                           controller: tecConfirmationCode,
                           style: const TextStyle(color: Colors.blue),
                           textAlign: TextAlign.center,
+                          readOnly: !isWaitingForConfirmationCode,
                           showCursor: true,
-                          autofocus: true,
+                          autofocus: isWaitingForConfirmationCode,
                           decoration: InputDecoration(
                             labelText: "Confirmation code",
                             floatingLabelAlignment: FloatingLabelAlignment.center,
@@ -177,14 +185,14 @@ class _MyHomePage extends State<MyHomePage> {
                           ),
                         )
                       ],
-                    )
-                :
-                    const SizedBox()
-                ,
+                  ),
                 const SizedBox(height: 22,),
                 ElevatedButton(
-                  onPressed: _ok,
-                  child: const Text('OK', textScaleFactor: 1.4,),
+                  onPressed: isWaitingForConfirmationCode? _ok:null,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: const Text('OK', textScaleFactor: 1.4,),
+                  ),
                 ),
                 const SizedBox(height: 22,),
                 isWaitingForConfirmationCode?

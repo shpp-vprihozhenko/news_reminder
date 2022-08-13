@@ -99,9 +99,9 @@ async function trySearch(body, res) {
         return;
     }
 
-    let news = await _getLast2daysNewsByKeyWords(body.keywords, body.sites, +body.deepDays);
-    console.log('found news', news.length);
-    res.status(200).send(JSON.stringify(news));
+    let links = await _getLast2daysNewsByKeyWords(body.keywords, body.sites, +body.deepDays);
+    console.log('found', links.length);
+    res.status(200).send(JSON.stringify(links));
 }
 
 async function getSearchList(body, res) { 
@@ -332,8 +332,7 @@ async function checkEmail(body, res) {
         from: "vprihogenko@gmail.com",
         to: email,
         subject: 'confirmation code',
-        html: "<html><h3>" + 'Hello. Your confirmation code is ' + testCode + "</h3></html>",
-        text: 'Hello. Your confirmation code is ' + testCode,
+        html: "<h3>"+'Hello. Your confirmation code is '+testCode+"</h3>",
     }
     if (await sendMail(message) == 0) { 
         console.log('err on email sending')
@@ -382,28 +381,23 @@ function sendMail(message) {
 
 async function _compareLinksAndEmailIfNeeded(oldLinks, newLinks, search) { 
     let linksToSend = [];
-    newLinks.forEach(el => {
-        let idx = oldLinks.findIndex(oldEl => el.link == oldEl.link);
-        if (idx == -1) { 
+    newLinks.forEach(el => { 
+        if (oldLinks.indexOf(el) == -1) { 
             linksToSend.push(el);
         }
     });
     console.log('got linksToSend', linksToSend.length);
     if (linksToSend.length > 0) { 
         console.log('sending email');
-        let html = '<html>Hello. \n <br>New links available with your request of <<'+search.keywords+'>>';
-        let text = 'Hello. \n New links available with your request of <<'+search.keywords+'>>';
+        let body = 'Hello. \n <br>New links available with your request of <<'+search.keywords+'>>';
         linksToSend.forEach(el => {
-            html += '<br>' + '<a href="'+el.link+'">'+el.title+'</a>';
-            text += '\n' + el.title+' -> '+el.link;
+            body += '<br>' + '<a href="'+el+'">'+el+'</a>';
         });
-        html+='</html>'
         message = {
             from: "vprihogenko@gmail.com",
             to: search.email,
             subject: 'News for '+search.keywords,
-            html,
-            text
+            html: body,
         }
         sendMail(message);
     }
@@ -460,8 +454,8 @@ async function _getLast2daysNewsByKeyWords(keywords, site, deepDays) {
     if (site.length > 3) { 
         options.params.sources = site;
     }
-  
-    let news = [];
+
+    let links = [];
     let isResult = false;
     let currentPage = 0; totalPages = 0;
     
@@ -470,21 +464,15 @@ async function _getLast2daysNewsByKeyWords(keywords, site, deepDays) {
             currentPage++;
             options.params.page = '' + currentPage;
             let result = await axios.request(options);
-            console.log('result status', currentPage, '=', result.status);
+            console.log('result status', result.status);
             let data = result.data;
             if (data.status == 'ok') {
                 totalPages = data.total_pages;
-                if (totalPages > 3) { 
-                    totalPages = 3;
-                }
                 let articles = data.articles;
                 articles.forEach(a => {
-                    news.push({
-                        link: a.link,
-                        title: a.title
-                    });
+                    links.push(a.link);
                 });
-                //console.log('got links', news);
+                console.log('got links', links);
                 isResult = true;
             } else {
                 console.log('got status', data.status);
@@ -497,11 +485,10 @@ async function _getLast2daysNewsByKeyWords(keywords, site, deepDays) {
             console.log('got err', e)
         }    
     } while (currentPage < totalPages);
-  
-    console.log('isResult', isResult, news.length);
-  
+
+    console.log('isResult', isResult, links.length);
+
     if (isResult) { 
-        return news;
+        return links;
     }
 }
-  

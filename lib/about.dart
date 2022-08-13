@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
-import 'globals.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+
+void main() async {
+  runApp(
+      const MediaQuery(
+          data: MediaQueryData(),
+          child: MaterialApp(home: About())
+      )
+  );
+}
 
 class About extends StatelessWidget {
   const About({Key? key}) : super(key: key);
@@ -23,32 +30,27 @@ class About extends StatelessWidget {
                   child: ListView(
                     shrinkWrap: true,
                     children:[
+                      const Text('News catcher', textScaleFactor: 1.3,),
                       Row(
                         children: const [
                           Expanded(
                               child: Text("""
 
-  This program is designed to monitor the health of Internet resources (websites and servers).
-  After registering in the AdminPage window, click <+> and specify the URL of the Internet resource, the type of request, and the necessary headers or request body (for servers).
-  After that, the server part of the program will start checking the activity of the Internet resource at a specified frequency, and if the resource does not give a positive response to the server request, you will receive an email notifying you of this.
-  You can specify the port after the colon into url if needed.
-  The maximum resource check frequency for users without a subscription is 2 requests per day.
-    
-    Subscription.
+This program is intended to help you catching important events or news.
+After registering you can add a new search with the Plus button <+>. 
+Specify needed keywords, news websites (optional) and relax.
+As soon as news with such keywords appear, a special server will send you a letter with direct links to them.
+With the <Touch> button you can test your keywords and get the list of links to the latest news.
+Rescan of news is processed every day.
   
-  When paying for a monthly subscription, you can:
-    - set rescan frequency up to 1 request per minute,
-    - receive additional notification to the telegram channel.
-    - say "thanks" to developer:)
-  
-  It costs only \$1 per month!
-
-  To receive messages on the telegram channel, you need to go to the telegram channel""")
+  """)
                           ),
                         ],
                       ),
+                      const Text('Author and programmer -\nVolodymyr Prykhozhenko', textAlign: TextAlign.center,),
+                      Image.asset('assets/v1.jpg'),
                       const SizedBox(height: 16,),
-                      const Text('Wishes and recommendations please write to', textAlign: TextAlign.center,),
+                      const Text('Wishes and recommendations please send to', textAlign: TextAlign.center,),
                       GestureDetector(
                         child: Container(
                           color: Colors.lightGreen[200],
@@ -62,6 +64,7 @@ class About extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('email copied to clipboard')));
                         },
                       ),
+                      const SizedBox(height: 46,),
                     ],
                   ),
                 )

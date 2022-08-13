@@ -1,3 +1,4 @@
+
 const axios = require("axios");
 const fs = require('fs');
 const http = require("http");
@@ -332,8 +333,7 @@ async function checkEmail(body, res) {
         from: "vprihogenko@gmail.com",
         to: email,
         subject: 'confirmation code',
-        html: "<html><h3>" + 'Hello. Your confirmation code is ' + testCode + "</h3></html>",
-        text: 'Hello. Your confirmation code is ' + testCode,
+        html: "<h3>"+'Hello. Your confirmation code is '+testCode+"</h3>",
     }
     if (await sendMail(message) == 0) { 
         console.log('err on email sending')
@@ -391,19 +391,15 @@ async function _compareLinksAndEmailIfNeeded(oldLinks, newLinks, search) {
     console.log('got linksToSend', linksToSend.length);
     if (linksToSend.length > 0) { 
         console.log('sending email');
-        let html = '<html>Hello. \n <br>New links available with your request of <<'+search.keywords+'>>';
-        let text = 'Hello. \n New links available with your request of <<'+search.keywords+'>>';
+        let body = 'Hello. \n <br>New links available with your request of <<'+search.keywords+'>>';
         linksToSend.forEach(el => {
-            html += '<br>' + '<a href="'+el.link+'">'+el.title+'</a>';
-            text += '\n' + el.title+' -> '+el.link;
+            body += '<br>' + '<a href="'+el.link+'">'+el.title+'</a>';
         });
-        html+='</html>'
         message = {
             from: "vprihogenko@gmail.com",
             to: search.email,
             subject: 'News for '+search.keywords,
-            html,
-            text
+            html: body,
         }
         sendMail(message);
     }
@@ -474,8 +470,8 @@ async function _getLast2daysNewsByKeyWords(keywords, site, deepDays) {
             let data = result.data;
             if (data.status == 'ok') {
                 totalPages = data.total_pages;
-                if (totalPages > 3) { 
-                    totalPages = 3;
+                if (totalPages > 10) { 
+                    totalPages = 10;
                 }
                 let articles = data.articles;
                 articles.forEach(a => {

@@ -7,6 +7,18 @@ import 'package:flutter/foundation.dart';
 String glNodeUrl = kIsWeb?'http://localhost:6635' : 'http://173.212.250.234:6635';
 String glEmail='', glName='', glCode = '';
 
+Search glSearch = Search();
+
+class News {
+  String link = '';
+  String title = '';
+
+  @override
+  String toString() {
+    return 'news: link $link title $title';
+  }
+}
+
 class Search {
   String id = '';
   String keywords = '';
@@ -50,6 +62,43 @@ Future <List<Search>> glGetExistingSearches() async {
     }
   }
   return [];
+}
+
+Future <List<News>> glTrySearch(keywords, sites, deepDays) async {
+  List<News> ls = [];
+  print('send req to $glNodeUrl/trySearch');
+  var response = await http.post(Uri.parse('$glNodeUrl/trySearch'),
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(
+        <String, dynamic> {
+          "email": glEmail,
+          "code": glCode,
+          "keywords": keywords,
+          "sites": sites,
+          "deepDays": deepDays
+        }
+    ),
+  );
+  print('got response status: ${response.statusCode} body ${response.body}');
+  if (response.statusCode == 200) {
+    try {
+      var j = jsonDecode(response.body);
+      print('got j\n$j');
+      j.forEach((el){
+        News n = News();
+        n.title = el['title'];
+        n.link = el['link'];
+        ls.add(n);
+      });
+      return ls;
+    } catch(e){
+      print('got e $e');
+    }
+  }
+
+  return ls;
 }
 
 Future <String> delSearch(id) async {
